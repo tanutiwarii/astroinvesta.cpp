@@ -1,0 +1,114 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <regex>
+
+bool isStrongPassword(const std::string& password) {
+    // Check if the password contains at least one uppercase letter, one lowercase letter, one digit, and one special character
+    std::regex uppercaseRegex("[A-Z]");
+    std::regex lowercaseRegex("[a-z]");
+    std::regex digitRegex("[0-9]");
+    std::regex specialCharRegex("[!@#\\$%^&*()_+\\-=\\[\\]{};':\",.<>?]");
+
+    return (std::regex_search(password, uppercaseRegex) &&
+            std::regex_search(password, lowercaseRegex) &&
+            std::regex_search(password, digitRegex) &&
+            std::regex_search(password, specialCharRegex));
+}
+
+struct Stock {
+    std::string name;
+    double purchasePrice;
+    double currentPrice;
+    std::vector<double> historicalPrices;  // Historical stock prices for the last 10 days
+};
+
+// Function to recommend action for a stock based on profit/loss
+std::string recommendAction(const Stock& stock) {
+    double profitMargin = (stock.currentPrice - stock.purchasePrice) / stock.purchasePrice * 100;
+
+    if (profitMargin > 5.0) {
+        return "Buy";
+    } else if (profitMargin < -5.0) {
+        return "Sell";
+    } else {
+        return "Hold";
+    }
+}
+
+int main() {
+    std::string username, password;
+
+    // Registration
+    std::cout << "Registration Page" << std::endl;
+    std::cout << "Enter your username: ";
+    std::cin >> username;
+
+    // Password complexity check
+    do {
+        std::cout << "Enter a strong password (contains uppercase, lowercase, digit, special character): ";
+        std::cin >> password;
+    } while (!isStrongPassword(password));
+
+    std::cout << "Registration Successful" << std::endl;
+
+    // Login
+    std::string enteredUsername, enteredPassword;
+
+    std::cout << "Login Page" << std::endl;
+    std::cout << "Enter your username: ";
+    std::cin >> enteredUsername;
+    std::cout << "Enter your password: ";
+    std::cin >> enteredPassword;
+
+    if (username == enteredUsername && password == enteredPassword) {
+        std::cout << "Login Successful" << std::endl;
+
+        // Create information for 5 real stocks (example data)
+        std::vector<Stock> stocks;
+        
+        stocks.push_back({"Apple Inc.", 150.0, 160.0, {155.0, 157.0, 158.0, 159.0, 162.0, 160.0, 162.0, 164.0, 165.0, 166.0}});
+        stocks.push_back({"Microsoft Corporation", 300.0, 290.0, {295.0, 292.0, 295.5, 294.0, 293.5, 295.0, 296.0, 298.0, 299.0, 298.5}});
+        stocks.push_back({"Alphabet Inc.", 2500.0, 2550.0, {2555.0, 2560.0, 2555.5, 2557.0, 2562.0, 2565.0, 2564.0, 2566.0, 2568.0, 2570.0}});
+        stocks.push_back({"Tesla, Inc.", 700.0, 680.0, {690.0, 685.0, 687.0, 689.0, 688.5, 690.0, 691.0, 692.0, 695.0, 696.0}});
+        stocks.push_back({"Amazon.com, Inc.", 3500.0, 3550.0, {3555.0, 3557.0, 3560.0, 3558.0, 3559.0, 3562.0, 3563.0, 3564.0, 3565.0, 3566.0}});
+
+        // Display the names of all stocks
+        std::cout << "Available stocks: " << std::endl;
+        for (int i = 0; i < stocks.size(); i++) {
+            std::cout << i + 1 << ". " << stocks[i].name << std::endl;
+        }
+
+        // Ask the user for their choice
+        int choice;
+        std::cout << "Enter the number of the stock you want information about: ";
+        std::cin >> choice;
+
+        // Check if the choice is valid
+        if (choice >= 1 && choice <= stocks.size()) {
+            // Get the selected stock
+            const Stock& selectedStock = stocks[choice - 1];
+            std::string action = recommendAction(selectedStock);
+            
+            // Display details and recommendation for the selected stock
+            std::cout << "Details for " << selectedStock.name << ":" << std::endl;
+            std::cout << "Purchase Price: $" << selectedStock.purchasePrice << std::endl;
+            std::cout << "Current Price: $" << selectedStock.currentPrice << std::endl;
+            std::cout << "Historical Stock Prices for the Last 10 Days:" << std::endl;
+            for (double price : selectedStock.historicalPrices) {
+                std::cout << price << " "<<std::endl;
+            }
+            std::cout << "Recommendation: " << action << " (Profit Margin: " << ((selectedStock.currentPrice - selectedStock.purchasePrice) / selectedStock.purchasePrice) * 100 << "%)" << std::endl;
+
+            // Display historical stock prices for the last 10 days
+            
+            std::cout << std::endl;
+        } else {
+            std::cout << "Invalid choice. Please enter a valid stock number." << std::endl;
+        }
+    } else {
+        std::cout << "Login Failed. Please try again." << std::endl;
+    }
+
+    return 0;
+}
